@@ -27,7 +27,7 @@ services:
     ports:
       - "2222:22"
     environment:
-      - PHP_IDE_CONFIG=serverName=obn
+      - PHP_IDE_CONFIG=serverName=sfw
       - XDEBUG_CONFIG=${XDEBUG_CONFIG}
       - DOCKER_HOST=tcp://docker-in-docker:2375
     networks:
@@ -51,7 +51,7 @@ services:
     extra_hosts:
       - "dockerhost:10.0.75.1"
     environment:
-      - PHP_IDE_CONFIG=serverName=obn
+      - PHP_IDE_CONFIG=serverName=sfw
       - XDEBUG_CONFIG=${XDEBUG_CONFIG}
       - DOCKER_HOST=tcp://docker-in-docker:2375
     depends_on:
@@ -101,7 +101,7 @@ services:
     ports:
       - "3306:3306"
     networks:
-      - api
+      - app
 
   pma:
     container_name: 'sfw-pma'
