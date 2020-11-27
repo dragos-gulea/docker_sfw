@@ -1,0 +1,119 @@
+version: '3.4'
+
+networks:
+  app:
+    driver: bridge
+
+volumes:
+  mysql:
+    driver: local
+  phpmyadmin:
+    driver: local
+
+services:
+  app:
+    container_name: 'sfw-app'
+    build:
+      context: ./app
+      args:
+        - DOCKER_PHP_VERSION=${PHP_VERSION}
+        - PUID=${PUID}
+        - PGID=${PGID}
+        - TIMEZONE=${TIMEZONE}
+    volumes:
+      - ../sfw/:/var/www
+    extra_hosts:
+      - "dockerhost:10.0.75.1"
+    ports:
+      - "2222:22"
+    environment:
+      - PHP_IDE_CONFIG=serverName=obn
+      - XDEBUG_CONFIG=${XDEBUG_CONFIG}
+      - DOCKER_HOST=tcp://docker-in-docker:2375
+    networks:
+      - app
+
+  php-fpm:
+    container_name: 'sfw-php'
+    build:
+      context: ./php-fpm
+      args:
+        - DOCKER_PHP_VERSION=${PHP_VERSION}
+        - ENV=dev
+    volumes:
+      - ./php-fpm/php${PHP_VERSION}.ini:/usr/local/etc/php/php.ini
+      - ./php-fpm/xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+      - ../:/var/www
+    ports:
+      - "9001:9001"
+    expose:
+      - "9000"
+    extra_hosts:
+      - "dockerhost:10.0.75.1"
+    environment:
+      - PHP_IDE_CONFIG=serverName=obn
+      - XDEBUG_CONFIG=${XDEBUG_CONFIG}
+      - DOCKER_HOST=tcp://docker-in-docker:2375
+    depends_on:
+      - app
+    networks:
+      - app
+
+  nginx:
+    container_name: 'sfw-nginx'
+    build:
+      context: ./nginx
+      args:
+        - PHP_UPSTREAM_CONTAINER=php-fpm
+        - PHP_UPSTREAM_PORT=9000
+        - ENV=dev
+    environment:
+      - LE_ACME_HTTP_PORT=80
+      - LE_ACME_TLS_PORT=443
+    volumes:
+      - ../:/var/www
+      - ./data/logs/nginx/:/var/log/nginx
+      - ./nginx/sites/dev/:/etc/nginx/sites-available
+    ports:
+      - "80-81:80-81"
+      - "443-445:443-445"
+    depends_on:
+      - php-fpm
+    networks:
+      - app
+
+  mysql:
+    container_name: 'sfw-mysql'
+    build:
+      context: ./mysql
+      args:
+        - MYSQL_VERSION=${MYSQL_VERSION}
+        - TIMEZONE=${TIMEZONE}
+    restart: on-failure
+    environment:
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - TIMEZONE=${TIMEZONE}
+    volumes:
+      - ./data/mysql:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - api
+
+  pma:
+    container_name: 'sfw-pma'
+    build: ./pma
+    environment:
+      - PMA_HOST=${PMA_HOST}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+    ports:
+      - "8080:80"
+    depends_on:
+      - mysql
+    networks:
+      - app
