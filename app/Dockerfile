@@ -153,20 +153,4 @@ RUN chmod 0644 /etc/cron.d/sfw && \
     crontab -u root /etc/cron.d/sfw && \
     touch /var/log/working-hours.log
 
-# Install localstak (for aws s3)
-
-RUN pip install awscli && \
-    aws configure set aws_access_key_id WS3KEY && \
-    aws configure set aws_secret_access_key Ws3Secret && \
-    aws configure set region us-west-2
-
-
-# Installing redis
-USER root
-RUN pecl install -o -f redis \
-&&  rm -rf /tmp/pear \
-&&  echo "extension=redis.so" > /usr/local/etc/php/conf.d/redis.ini
-
 WORKDIR /var/www
-
-CMD [ "api-run" ]

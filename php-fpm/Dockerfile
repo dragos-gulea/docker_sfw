@@ -64,6 +64,13 @@ RUN if [ ${ENV} = "dev" ]; then \
 
 ################################################################################
 
+# Installing redis
+USER root
+
+RUN pecl install -o -f redis \
+&&  rm -rf /tmp/pear \
+&&  echo "extension=redis.so" > /usr/local/etc/php/conf.d/redis.ini
+
 RUN usermod -u 1000 www-data
 
 USER www-data

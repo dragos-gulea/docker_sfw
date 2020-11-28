@@ -31,4 +31,12 @@ RUN echo "upstream php-upstream { server php-fpm:9000; }" > /etc/nginx/conf.d/up
 
 ################################################################################
 
+COPY ./acme.sh /usr/local/bin/acme.sh
+
+RUN chmod +x /usr/local/bin/acme.sh
+
+COPY ./startup.sh /opt/startup.sh
+RUN sed -i 's/\r//g' /opt/startup.sh
+CMD ["/bin/bash", "/opt/startup.sh"]
+
 EXPOSE 80 443 7000

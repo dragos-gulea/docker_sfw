@@ -75,8 +75,8 @@ services:
       - ./data/logs/nginx/:/var/log/nginx
       - ./nginx/sites/dev/:/etc/nginx/sites-available
     ports:
-      - "80-81:80-81"
-      - "443-445:443-445"
+      - "80:80"
+      - "443:443"
     depends_on:
       - php-fpm
     networks:
@@ -115,5 +115,16 @@ services:
       - "8080:80"
     depends_on:
       - mysql
+    networks:
+      - app
+
+  redis:
+    container_name: 'sfw-redis'
+    build:
+      context: ./redis
+    volumes:
+      - ./data/redis:/data
+    ports:
+      - "6379:6379"
     networks:
       - app
