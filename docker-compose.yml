@@ -28,7 +28,7 @@ services:
       - "2222:22"
     environment:
       - PHP_IDE_CONFIG=serverName=sfw
-      - XDEBUG_CONFIG=${XDEBUG_CONFIG}
+      #- XDEBUG_CONFIG=${XDEBUG_CONFIG}
       - DOCKER_HOST=tcp://docker-in-docker:2375
     networks:
       - app
@@ -42,7 +42,7 @@ services:
         - ENV=dev
     volumes:
       - ./php-fpm/php${PHP_VERSION}.ini:/usr/local/etc/php/php.ini
-      - ./php-fpm/xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+      #- ./php-fpm/xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
       - ../:/var/www
     ports:
       - "9001:9001"
@@ -52,7 +52,7 @@ services:
       - "dockerhost:10.0.75.1"
     environment:
       - PHP_IDE_CONFIG=serverName=sfw
-      - XDEBUG_CONFIG=${XDEBUG_CONFIG}
+      #- XDEBUG_CONFIG=${XDEBUG_CONFIG}
       - DOCKER_HOST=tcp://docker-in-docker:2375
     depends_on:
       - app

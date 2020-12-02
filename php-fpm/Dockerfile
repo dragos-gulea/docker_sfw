@@ -57,10 +57,10 @@ RUN apt-get install -y libxml2-dev libxrender1 libfontconfig1 libxext6 && \
 
 ################################################################################
 
-RUN if [ ${ENV} = "dev" ]; then \
-	    pecl install xdebug; \
-	    docker-php-ext-enable xdebug; \
-	fi ;
+#RUN if [ ${ENV} = "dev" ]; then \
+#	    pecl install xdebug; \
+#	    docker-php-ext-enable xdebug; \
+#	fi ;
 
 ################################################################################
 
